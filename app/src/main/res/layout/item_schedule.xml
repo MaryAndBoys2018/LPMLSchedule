@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_schedule"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="48dp">
+
+    <TextView
+        android:id="@+id/item_schedule_number"
+        android:layout_weight="1"
+        style="@style/GreenTextViewScheduleItem" />
+
+    <TextView
+        android:id="@+id/item_schedule_time"
+        android:layout_weight="2"
+        style="@style/TextViewScheduleItem" />
+
+    <TextView
+        android:id="@+id/item_schedule_subject"
+        android:layout_weight="10"
+        style="@style/GreenTextViewScheduleItem" />
+
+    <TextView
+        android:id="@+id/item_schedule_room"
+        android:layout_weight="2"
+        style="@style/TextViewScheduleItem" />
+
+</LinearLayout>
