@@ -6,13 +6,13 @@ public class Lesson {
     private Time startTime;
     private String room;
 
+    public Lesson() {
+    }
+
     public Lesson(String subject, Time startTime, String room) {
         this.subject = subject;
         this.startTime = startTime;
         this.room = room;
-    }
-
-    public Lesson() {
     }
 
     public String getSubject() {

@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         final LessonAdapter adapter = new LessonAdapter(this, currentSchedule);
         listView.setAdapter(adapter);
 
+
         tabLayout = findViewById(R.id.tab_layout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -43,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 currentSchedule.clear();
                 currentSchedule.addAll(schedule.get(tab.getPosition()));
                 adapter.notifyDataSetChanged();
-
             }
 
             @Override
