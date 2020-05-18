@@ -2,30 +2,32 @@ package com.example.lpmlschedule.model;
 
 public class Time {
 
+    public static final int MINUTES_IN_HOUR = 60;
+
     private int hour;
     private int minute;
-
-    public Time() {
-    }
 
     public Time(int hour, int minute) {
         this.hour = hour;
         this.minute = minute;
     }
 
-    public Time addMinutes(int minutes) {
-        int newMinutes = this.minute + minutes % 60;
-        int newHours = this.hour + minutes / 60;
-        if (newMinutes >= 60) {
-            newMinutes -= 60;
-            newHours += 1;
-        }
-        return new Time(newHours, newMinutes);
+    public Time() {
     }
 
     @Override
     public String toString() {
         return this.hour + ":" + (this.minute < 10 ? "0" : "") + this.minute;
+    }
+
+    public Time addMinutes(int minutes) {
+        int newMinutes = this.minute + minutes % MINUTES_IN_HOUR;
+        int newHour = this.hour + minutes / MINUTES_IN_HOUR;
+        if (newMinutes >= MINUTES_IN_HOUR) {
+            newMinutes -= MINUTES_IN_HOUR;
+            newHour++;
+        }
+        return new Time(newHour, newMinutes);
     }
 
     public int getHour() {

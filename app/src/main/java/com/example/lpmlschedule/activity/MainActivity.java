@@ -12,30 +12,30 @@ import com.example.lpmlschedule.model.Time;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView scheduleList;
-    private TabLayout tabLayout;
-
     private List<List<Lesson>> schedule;
     private List<Lesson> currentSchedule;
 
+    private ListView listView;
+    private TabLayout tabLayout;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initializeLessons();
+        initializeSchedule();
 
         currentSchedule = new ArrayList<>();
-        currentSchedule = schedule.get(0);
+        currentSchedule.addAll(schedule.get(0));
 
-        scheduleList = findViewById(R.id.schedule_list);
+        listView = findViewById(R.id.schedule_list);
         final LessonAdapter adapter = new LessonAdapter(this, currentSchedule);
-        scheduleList.setAdapter(adapter);
+        listView.setAdapter(adapter);
+
 
         tabLayout = findViewById(R.id.tab_layout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -56,56 +56,57 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
-    private void initializeLessons() {
+    public void initializeSchedule() {
         List<Lesson> mondayLessons = new ArrayList<>();
-        mondayLessons.add(new Lesson("Математика", new Time(8, 30), "205"));
-        mondayLessons.add(new Lesson("Математика", new Time(9, 25), "205"));
-        mondayLessons.add(new Lesson("Математика", new Time(10, 20), "205"));
-        mondayLessons.add(new Lesson("Математика", new Time(11, 25), "205"));
-        mondayLessons.add(new Lesson("Математика", new Time(12, 30), "205"));
-        mondayLessons.add(new Lesson("Математика", new Time(13, 35), "205"));
+        mondayLessons.add(new Lesson("Андроїд курси", new Time(9, 0), "205"));
+        mondayLessons.add(new Lesson("Андроїд курси", new Time(10, 5), "205"));
+        mondayLessons.add(new Lesson("Андроїд курси", new Time(11, 10), "205"));
+        mondayLessons.add(new Lesson("Андроїд курси", new Time(12, 5), "205"));
+        mondayLessons.add(new Lesson("Андроїд курси", new Time(13, 20), "205"));
+        mondayLessons.add(new Lesson("Андроїд курси", new Time(14, 45), "205"));
 
         List<Lesson> tuesdayLessons = new ArrayList<>();
-        tuesdayLessons.add(new Lesson("Фізика", new Time(8, 30), "205"));
-        tuesdayLessons.add(new Lesson("Фізика", new Time(9, 25), "205"));
-        tuesdayLessons.add(new Lesson("Фізика", new Time(10, 20), "205"));
-        tuesdayLessons.add(new Lesson("Фізика", new Time(11, 25), "205"));
-        tuesdayLessons.add(new Lesson("Фізика", new Time(12, 30), "205"));
-        tuesdayLessons.add(new Lesson("Фізика", new Time(13, 35), "205"));
+        tuesdayLessons.add(new Lesson("Інформатика", new Time(9, 0), "301"));
+        tuesdayLessons.add(new Lesson("Інформатика", new Time(10, 5), "301"));
+        tuesdayLessons.add(new Lesson("Інформатика", new Time(11, 10), "301"));
+        tuesdayLessons.add(new Lesson("Інформатика", new Time(12, 5), "301"));
+        tuesdayLessons.add(new Lesson("Інформатика", new Time(13, 20), "301"));
+        tuesdayLessons.add(new Lesson("Інформатика", new Time(14, 45), "301"));
 
         List<Lesson> wednesdayLessons = new ArrayList<>();
-        wednesdayLessons.add(new Lesson("Інформатика", new Time(8, 30), "205"));
-        wednesdayLessons.add(new Lesson("Інформатика", new Time(9, 25), "205"));
-        wednesdayLessons.add(new Lesson("Інформатика", new Time(10, 20), "205"));
-        wednesdayLessons.add(new Lesson("Інформатика", new Time(11, 25), "205"));
-        wednesdayLessons.add(new Lesson("Інформатика", new Time(12, 30), "205"));
-        wednesdayLessons.add(new Lesson("Інформатика", new Time(13, 35), "205"));
+        wednesdayLessons.add(new Lesson("Англійська мова", new Time(9, 0), "301"));
+        wednesdayLessons.add(new Lesson("Англійська мова", new Time(10, 5), "301"));
+        wednesdayLessons.add(new Lesson("Англійська мова", new Time(11, 10), "301"));
+        wednesdayLessons.add(new Lesson("Англійська мова", new Time(12, 5), "301"));
+        wednesdayLessons.add(new Lesson("Англійська мова", new Time(13, 20), "301"));
+        wednesdayLessons.add(new Lesson("Англійська мова", new Time(14, 45), "301"));
 
         List<Lesson> thursdayLessons = new ArrayList<>();
-        thursdayLessons.add(new Lesson("Математика", new Time(8, 30), "205"));
-        thursdayLessons.add(new Lesson("Математика", new Time(9, 25), "205"));
-        thursdayLessons.add(new Lesson("Математика", new Time(10, 20), "205"));
-        thursdayLessons.add(new Lesson("Математика", new Time(11, 25), "205"));
-        thursdayLessons.add(new Lesson("Математика", new Time(12, 30), "205"));
-        thursdayLessons.add(new Lesson("Математика", new Time(13, 35), "205"));
+        thursdayLessons.add(new Lesson("Математика", new Time(9, 0), "301"));
+        thursdayLessons.add(new Lesson("Математика", new Time(10, 5), "301"));
+        thursdayLessons.add(new Lesson("Математика", new Time(11, 10), "301"));
+        thursdayLessons.add(new Lesson("Математика", new Time(12, 5), "301"));
+        thursdayLessons.add(new Lesson("Математика", new Time(13, 20), "301"));
+        thursdayLessons.add(new Lesson("Математика", new Time(14, 45), "301"));
 
         List<Lesson> fridayLessons = new ArrayList<>();
-        fridayLessons.add(new Lesson("Фізика", new Time(8, 30), "205"));
-        fridayLessons.add(new Lesson("Фізика", new Time(9, 25), "205"));
-        fridayLessons.add(new Lesson("Фізика", new Time(10, 20), "205"));
-        fridayLessons.add(new Lesson("Фізика", new Time(11, 25), "205"));
-        fridayLessons.add(new Lesson("Фізика", new Time(12, 30), "205"));
-        fridayLessons.add(new Lesson("Фізика", new Time(13, 35), "205"));
+        fridayLessons.add(new Lesson("Фізика", new Time(9, 0), "301"));
+        fridayLessons.add(new Lesson("Фізика", new Time(10, 5), "301"));
+        fridayLessons.add(new Lesson("Фізика", new Time(11, 10), "301"));
+        fridayLessons.add(new Lesson("Фізика", new Time(12, 5), "301"));
+        fridayLessons.add(new Lesson("Фізика", new Time(13, 20), "301"));
+        fridayLessons.add(new Lesson("Фізика", new Time(14, 45), "301"));
 
         List<Lesson> saturdayLessons = new ArrayList<>();
-        saturdayLessons.add(new Lesson("Англійська мова", new Time(8, 30), "205"));
-        saturdayLessons.add(new Lesson("Англійська мова", new Time(9, 25), "205"));
-        saturdayLessons.add(new Lesson("Англійська мова", new Time(10, 20), "205"));
-        saturdayLessons.add(new Lesson("Англійська мова", new Time(11, 25), "205"));
-        saturdayLessons.add(new Lesson("Англійська мова", new Time(12, 30), "205"));
-        saturdayLessons.add(new Lesson("Англійська мова", new Time(13, 35), "205"));
+        saturdayLessons.add(new Lesson("Фізичне виховання", new Time(9, 0), "301"));
+        saturdayLessons.add(new Lesson("Фізичне виховання", new Time(10, 5), "301"));
+        saturdayLessons.add(new Lesson("Фізичне виховання", new Time(11, 10), "301"));
+        saturdayLessons.add(new Lesson("Фізичне виховання", new Time(12, 5), "301"));
+        saturdayLessons.add(new Lesson("Фізичне виховання", new Time(13, 20), "301"));
+        saturdayLessons.add(new Lesson("Фізичне виховання", new Time(14, 45), "301"));
 
         schedule = new ArrayList<>();
         schedule.add(mondayLessons);

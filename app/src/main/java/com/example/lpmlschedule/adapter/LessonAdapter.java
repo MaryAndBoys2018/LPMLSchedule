@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 
 public class LessonAdapter extends ArrayAdapter<Lesson> {
 
-    private static final int LESSON_DURATION = 45;
+    public static final int LESSON_DURATION = 45;
 
     public LessonAdapter(@NonNull Context context, @NonNull List<Lesson> objects) {
         super(context, 0, objects);
@@ -33,17 +33,18 @@ public class LessonAdapter extends ArrayAdapter<Lesson> {
 
         Lesson lesson = getItem(position);
 
-        TextView numberView = convertView.findViewById(R.id.item_schedule_number);
-        numberView.setText(Integer.toString(position + 1));
+        TextView numberTextView = convertView.findViewById(R.id.item_schedule_number);
+        numberTextView.setText(Integer.toString(position + 1));
 
-        TextView subjectView = convertView.findViewById(R.id.item_schedule_subject);
-        subjectView.setText(lesson.getSubject());
+        TextView subjectTextView = convertView.findViewById(R.id.item_schedule_subject);
+        subjectTextView.setText(lesson.getSubject());
 
-        TextView roomView = convertView.findViewById(R.id.item_schedule_room);
-        roomView.setText(lesson.getRoom());
+        TextView roomTextView = convertView.findViewById(R.id.item_schedule_room);
+        roomTextView.setText(lesson.getRoom());
 
-        TextView timeView = convertView.findViewById(R.id.item_schedule_time);
-        timeView.setText(lesson.getStartTime() + "-" + lesson.getStartTime().addMinutes(LESSON_DURATION));
+        TextView timeTextView = convertView.findViewById(R.id.item_schedule_time);
+        timeTextView.setText(lesson.getStartTime() + "-"
+                + lesson.getStartTime().addMinutes(LESSON_DURATION));
 
         return convertView;
     }
