@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/DialogCardStyle"
+    app:cardCornerRadius="16dip">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewScheduleItem"
+                android:layout_marginStart="8dp"
+                android:text="@string/subject" />
+
+            <EditText
+                style="@style/EditTextStyle"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:hint="@string/name" />
+        </LinearLayout>
+
+        <EditText
+            style="@style/EditTextStyle"
+            android:layout_margin="8dp"
+            android:hint="@string/task_list" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewScheduleItem"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/deadline"
+                android:textAlignment="textStart" />
+
+            <EditText
+                style="@style/EditTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:hint="@string/_11_00"
+                android:textAlignment="center" />
+
+            <EditText
+                style="@style/EditTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="2"
+                android:hint="@string/_24_05_2020"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:gravity="end">
+
+            <Button
+                style="@style/CancelButton"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel" />
+
+            <Button
+                style="@style/ConfirmButton"
+                android:layout_height="wrap_content"
+                android:text="@string/confirm" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
