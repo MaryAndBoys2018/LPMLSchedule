@@ -1,6 +1,7 @@
 package com.example.lpmlschedule.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -19,13 +20,19 @@ import com.example.lpmlschedule.model.Time;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<List<Lesson>> schedule;
+    private Map<String, List<Lesson>> schedule = new HashMap<>();
     private List<Lesson> currentSchedule;
     private List<Lesson> mondayLessons;
     private List<Lesson> tuesdayLessons;
@@ -33,11 +40,15 @@ public class MainActivity extends AppCompatActivity {
     private List<Lesson> thursdayLessons;
     private List<Lesson> fridayLessons;
     private List<Lesson> saturdayLessons;
+    LessonAdapter adapter;
+    private final List<String> daysList =
+            new ArrayList(Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"));
 
     private int currentTab;
 
     private ListView listView;
     private TabLayout tabLayout;
+    private final String CURRENT_CLASS = "11-Г";
 
     private FloatingActionButton addLessonFab;
     private Dialog dialog;
@@ -48,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private Button confirmButton;
 
     protected BottomNavigationView navigation;
+    private FirebaseFirestore firebaseFirestore;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -79,11 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
         initializeSchedule();
 
-        currentSchedule = new ArrayList<>();
-        currentSchedule.addAll(schedule.get(0));
-
         listView = findViewById(R.id.schedule_list);
-        final LessonAdapter adapter = new LessonAdapter(this, currentSchedule);
+        adapter = new LessonAdapter(this, currentSchedule);
         listView.setAdapter(adapter);
 
         tabLayout = findViewById(R.id.tab_layout);
@@ -92,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 currentTab = tab.getPosition();
                 currentSchedule.clear();
-                currentSchedule.addAll(schedule.get(tab.getPosition()));
+                currentSchedule.addAll(schedule.get(daysList.get(currentTab)));
                 adapter.notifyDataSetChanged();
             }
 
@@ -119,49 +128,53 @@ public class MainActivity extends AppCompatActivity {
         cancelButton = dialog.findViewById(R.id.cancel);
         confirmButton = dialog.findViewById(R.id.confirm);
 
-        addLessonFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.show();
-            }
+        addLessonFab.setOnClickListener(v -> dialog.show());
+
+        cancelButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            numberEditText.getText().clear();
+            nameEditText.getText().clear();
+            roomEditText.getText().clear();
         });
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                numberEditText.getText().clear();
-                nameEditText.getText().clear();
-                roomEditText.getText().clear();
-            }
-        });
-
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        confirmButton.setOnClickListener( v -> {
                 int lessonNumber = Integer.parseInt(numberEditText.getText().toString());
                 String lessonName = nameEditText.getText().toString();
                 String lessonRoom = roomEditText.getText().toString();
-
-                getDaySchedule(currentTab).set(lessonNumber - 1, new Lesson(lessonName, createTime(lessonNumber - 1), lessonRoom));
-                currentSchedule.clear();
-                currentSchedule.addAll(schedule.get(currentTab));
+                Lesson lessonToAdd = new Lesson(lessonName, createTime(lessonNumber - 1), lessonRoom);
+                currentSchedule.add(lessonNumber - 1,  lessonToAdd);
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();
-            }
+
         });
     }
 
     public void initializeSchedule() {
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        currentSchedule = new ArrayList<>();
+
+        daysList.forEach( day -> firebaseFirestore.collection("classes")
+                .document(CURRENT_CLASS)
+                .collection(day).orderBy("startTime").get()
+                .addOnSuccessListener( queryDocumentSnapshots -> {
+                    schedule.put(day, queryDocumentSnapshots.toObjects(Lesson.class));
+                    if (day.equals(daysList.get(0))) {
+                        currentSchedule.addAll(schedule.get(day));
+                        adapter.notifyDataSetChanged();
+                    }
+                })
+        );
         mondayLessons = new ArrayList<>();
-        mondayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(1), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(2), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(3), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(4), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
-        mondayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
+        mondayLessons.add(new Lesson("Алгебра", createTime(0), "None"));
+        mondayLessons.add(new Lesson("Фізкультура", createTime(1), "None"));
+        mondayLessons.add(new Lesson("Біологія", createTime(2), "None"));
+        mondayLessons.add(new Lesson("Фізика", createTime(3), "None"));
+        mondayLessons.add(new Lesson("Фізика", createTime(4), "None"));
+        mondayLessons.add(new Lesson("Фізика", createTime(5), "None"));
+        mondayLessons.add(new Lesson("Фізика", createTime(6), "None"));
+        //mondayLessons.forEach(lesson -> firebaseFirestore.collection("classes")
+                //.document(CURRENT_CLASS)
+              //  .collection("Monday").add(lesson));
 
         tuesdayLessons = new ArrayList<>();
         tuesdayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
@@ -212,14 +225,6 @@ public class MainActivity extends AppCompatActivity {
         saturdayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
         saturdayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
         saturdayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
-
-        schedule = new ArrayList<>();
-        schedule.add(mondayLessons);
-        schedule.add(tuesdayLessons);
-        schedule.add(wednesdayLessons);
-        schedule.add(thursdayLessons);
-        schedule.add(fridayLessons);
-        schedule.add(saturdayLessons);
     }
 
     private Time createTime(int timeIndex) {
