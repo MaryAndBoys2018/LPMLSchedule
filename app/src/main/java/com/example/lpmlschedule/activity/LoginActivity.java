@@ -22,6 +22,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 /**
  * TODO add logging in with user and password, preferable with registration and firestore representation
+ * https://firebase.google.com/docs/auth/android/password-auth?authuser=1
  */
 public class LoginActivity extends AppCompatActivity {
     private static final int GSIn_REQUEST_CODE = 5689;
@@ -52,19 +53,23 @@ public class LoginActivity extends AppCompatActivity {
      * @param requestCode   code of request when launching activity for result
      * @param resultCode    code of result (success or error)
      * @param data    intent containing data that we requested
+     *      DON'T FORGET TO ENABLE LOGIN OPTIONS IN FIREBASE CONSOLE
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         auth = FirebaseAuth.getInstance(); // ініціалізуємо FirebaseAuth
         if (requestCode == GSIn_REQUEST_CODE) { // звіряємо чи requestCode співпадає із requestCode для логіну через гугєл
-            GoogleSignIn.getSignedInAccountFromIntent(data).addOnSuccessListener(googleSignInAccount -> { //дістаємо юзера з інтенту який нам прийшов
+            GoogleSignIn.getSignedInAccountFromIntent(data).addOnSuccessListener(googleSignInAccount -> { //дістаємо юзера з
+                // інтенту який нам прийшов
                 // (не забуваємо що основна функція інтентів - обмін даними мі актівіті)
-                AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null); //дістаємо credential із акаунту для того щоб передати дані про юзера фаєрбейзу
+                AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null); //дістаємо credential
+                // із акаунту для того щоб передати дані про юзера фаєрбейзу
                 auth.signInWithCredential(credential)
                         .addOnSuccessListener(this, this::updateUi)
                         .addOnFailureListener(e -> Log.e(TAG, "FAIL", e)); //логінимося і хендлимо ерор
-            }).addOnFailureListener(e -> Log.e(TAG, "FAIL", e)); // хендлимо ерор при діставанні юзера з інтенту (зазвичай старі гугл плей сервіси)
+            }).addOnFailureListener(e -> Log.e(TAG, "FAIL", e)); // хендлимо ерор при діставанні юзера з інтенту
+            // (зазвичай старі гугл плей сервіси або неналаштований цей спосіб логіну на консолі)
         }
     }
     /**
@@ -72,7 +77,6 @@ public class LoginActivity extends AppCompatActivity {
         TODO handle adding new user to database
     */
     private void updateUi(AuthResult info) {
-
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

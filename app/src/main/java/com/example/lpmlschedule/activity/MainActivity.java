@@ -23,6 +23,7 @@ import com.example.lpmlschedule.model.Time;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
@@ -87,6 +88,11 @@ public class MainActivity extends AppCompatActivity {
         navigation.setSelectedItemId(R.id.schedule);
 
         initializeSchedule();
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            startActivity(loginIntent);
+        }
 
         listView = findViewById(R.id.schedule_list);
         adapter = new LessonAdapter(this, currentSchedule);
@@ -219,6 +225,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
     }
 }
