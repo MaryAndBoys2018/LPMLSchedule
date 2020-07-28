@@ -5,13 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.lpmlschedule.R;
 import com.example.lpmlschedule.adapter.LessonAdapter;
@@ -34,12 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Map<String, List<Lesson>> schedule = new HashMap<>();
     private List<Lesson> currentSchedule;
-    private List<Lesson> mondayLessons;
-    private List<Lesson> tuesdayLessons;
-    private List<Lesson> wednesdayLessons;
-    private List<Lesson> thursdayLessons;
-    private List<Lesson> fridayLessons;
-    private List<Lesson> saturdayLessons;
     LessonAdapter adapter;
     private final List<String> daysList =
             new ArrayList(Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"));
@@ -48,7 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
     private TabLayout tabLayout;
-    private final String CURRENT_CLASS = "11-Г";
+
+    //TODO change constant to corresponding field of user from firestore
+
+    private final String CURRENT_CLASS = "11-A";
 
     private FloatingActionButton addLessonFab;
     private Dialog dialog;
@@ -61,23 +61,20 @@ public class MainActivity extends AppCompatActivity {
     protected BottomNavigationView navigation;
     private FirebaseFirestore firebaseFirestore;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.schedule:
-                    return true;
-                case R.id.deals:
-                    Intent dealsActivityIntent = new Intent(MainActivity.this, DealActivity.class);
-                    MainActivity.this.startActivity(dealsActivityIntent);
-                    return true;
-                case R.id.homework:
-                    Intent homeworkActivityIntent = new Intent(MainActivity.this, HomeworkActivity.class);
-                    MainActivity.this.startActivity(homeworkActivityIntent);
-                    return true;
-            }
-            return false;
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = item -> {
+        switch (item.getItemId()) {
+            case R.id.schedule:
+                return true;
+            case R.id.deals:
+                Intent dealsActivityIntent = new Intent(MainActivity.this, DealActivity.class);
+                MainActivity.this.startActivity(dealsActivityIntent);
+                return true;
+            case R.id.homework:
+                Intent homeworkActivityIntent = new Intent(MainActivity.this, HomeworkActivity.class);
+                MainActivity.this.startActivity(homeworkActivityIntent);
+                return true;
         }
+        return false;
     };
 
     @Override
@@ -117,7 +114,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         addLessonFab = findViewById(R.id.add_lesson_fab);
-
+        /** TODO add reading data from shared preferences and in case it is present open dialog containing all data
+        * https://developer.android.com/reference/android/content/SharedPreferences
+        */
         dialog = new Dialog(MainActivity.this);
         dialog.setContentView(R.layout.dialog_schedule);
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -142,20 +141,27 @@ public class MainActivity extends AppCompatActivity {
                 String lessonName = nameEditText.getText().toString();
                 String lessonRoom = roomEditText.getText().toString();
                 Lesson lessonToAdd = new Lesson(lessonName, createTime(lessonNumber - 1), lessonRoom);
-                currentSchedule.add(lessonNumber - 1,  lessonToAdd);
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
 
+                // додаємо даний урок на фаєрбейз
+                firebaseFirestore.collection(CURRENT_CLASS)
+                        .document(daysList.get(currentTab))
+                        .collection("lessons").add(lessonToAdd).addOnSuccessListener( aVoid -> {
+                    currentSchedule.add(lessonNumber - 1,  lessonToAdd);
+                    adapter.notifyDataSetChanged();
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(this, "Виникла помилка", Toast.LENGTH_LONG).show();
+                });
+                dialog.dismiss();
         });
     }
 
     public void initializeSchedule() {
         firebaseFirestore = FirebaseFirestore.getInstance();
         currentSchedule = new ArrayList<>();
-
-        daysList.forEach( day -> firebaseFirestore.collection("classes")
-                .document(CURRENT_CLASS)
-                .collection(day).orderBy("startTime").get()
+        // отримуємо розклад кожного дня з фаєрстору, якщо це понеділок, то відображаємо ці уроки
+        daysList.forEach( day -> firebaseFirestore.collection(CURRENT_CLASS).document(day)
+                .collection("lessons")
+                .orderBy("startTime").get()
                 .addOnSuccessListener( queryDocumentSnapshots -> {
                     schedule.put(day, queryDocumentSnapshots.toObjects(Lesson.class));
                     if (day.equals(daysList.get(0))) {
@@ -164,67 +170,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
         );
-        mondayLessons = new ArrayList<>();
-        mondayLessons.add(new Lesson("Алгебра", createTime(0), "None"));
-        mondayLessons.add(new Lesson("Фізкультура", createTime(1), "None"));
-        mondayLessons.add(new Lesson("Біологія", createTime(2), "None"));
-        mondayLessons.add(new Lesson("Фізика", createTime(3), "None"));
-        mondayLessons.add(new Lesson("Фізика", createTime(4), "None"));
-        mondayLessons.add(new Lesson("Фізика", createTime(5), "None"));
-        mondayLessons.add(new Lesson("Фізика", createTime(6), "None"));
-        //mondayLessons.forEach(lesson -> firebaseFirestore.collection("classes")
-                //.document(CURRENT_CLASS)
-              //  .collection("Monday").add(lesson));
-
-        tuesdayLessons = new ArrayList<>();
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(1), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(2), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(3), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(4), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
-        tuesdayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
-
-        wednesdayLessons = new ArrayList<>();
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(1), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(2), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(3), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(4), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
-        wednesdayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
-
-        thursdayLessons = new ArrayList<>();
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(1), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(2), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(3), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(4), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
-        thursdayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
-
-        fridayLessons = new ArrayList<>();
-        fridayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(1), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(2), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(3), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(4), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
-        fridayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
-
-        saturdayLessons = new ArrayList<>();
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(0), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(1), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(2), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(3), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(4), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(5), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(6), "None"));
-        saturdayLessons.add(new Lesson("Уроку немає", createTime(7), "None"));
     }
 
     private Time createTime(int timeIndex) {
@@ -267,28 +212,13 @@ public class MainActivity extends AppCompatActivity {
         return new Time(hours, minutes);
     }
 
-    private List<Lesson> getDaySchedule(int scheduleDayIndex) {
-        List<Lesson> currentList = new ArrayList<>();
-        switch (scheduleDayIndex) {
-            case 0:
-                currentList = mondayLessons;
-                break;
-            case 1:
-                currentList = tuesdayLessons;
-                break;
-            case 2:
-                currentList = wednesdayLessons;
-                break;
-            case 3:
-                currentList = thursdayLessons;
-                break;
-            case 4:
-                currentList = fridayLessons;
-                break;
-            case 5:
-                currentList = saturdayLessons;
-                break;
-        }
-        return currentList;
+
+    /** TODO add getting info from editTexts and writing it to shared preferences
+     * https://developer.android.com/reference/android/content/SharedPreferences
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+
     }
 }
